@@ -1,3 +1,4 @@
+// compiled from typescript dfa2regex.ts
 var Type;
 (function (Type) {
     Type[Type["Or"] = 0] = "Or";
@@ -76,11 +77,20 @@ function simplify(r) {
 var Automat = (function () {
     function Automat(inp) {
         var _this = this;
-        this.map = {};
+        this.names = [];
+        this.map = [];
+        var getId = function (name) {
+            var inx = _this.names.indexOf(name);
+            if (inx >= 0)
+                return inx;
+            else
+                return _this.names.push(name) - 1;
+        };
+        //this.names = inp.shift().split(',');
         inp.split('\n').map(function (line) { return line.trim(); }).filter(function (line) { return line.length > 0; }).forEach(function (line) {
-            var from = line[0], to = line[2];
-            var outp = new Regex(0 /* Or */, line.split(":")[1].trim().split(","));
-            _this.map[from] = _this.map[from] || {};
+            var from = getId(line[0]), to = getId(line[2]);
+            var outp = new Regex(0 /* Or */, line.split("over")[1].split(",").map(function (x) { return x.trim(); }));
+            _this.map[from] = _this.map[from] || [];
             _this.map[from][to] = outp;
         });
     }
@@ -105,6 +115,12 @@ var or = function () {
     }
     return new Regex(3 /* Star */, x);
 };
-var L = function (a, q1, i, q2) { return (i == 0) ? a.map[q1][q2] : or(L(a, q1, i - 1, q2), concat(L(a, q1, i - 1, i), star(L(a, i, i - 1, i)), L(a, i, i - 1, q2))); };
-var automat = new Automat(document.querySelector('#automat').value);
-document.write(simplify(L(automat, 1, 2, 2)).toString());
+// convert Automat to regex, going from state q1 to q2,
+// using only states from 0 to i
+var L = function (a, q1, i, q2) { return (i < 0) ? a.map[q1][q2] : or(L(a, q1, i - 1, q2), concat(L(a, q1, i - 1, i), star(L(a, i, i - 1, i)), L(a, i, i - 1, q2))); };
+function convert() {
+    var automat = new Automat(input.value);
+    var maxState = automat.names.length - 1;
+    output.textContent = simplify(L(automat, 0, maxState, maxState)).toString();
+}
+convert();

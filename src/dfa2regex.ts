@@ -1,3 +1,4 @@
+// compiled from typescript dfa2regex.ts
 enum Type {
 	Or, Concat, Maybe, Star, Plus
 }
@@ -65,32 +66,44 @@ function simplify(r:Regex) {
 
 class Automat {
 	constructor(inp:string) { // parse regex from string a→b:c,d
-		this.map = {};
+		var getId = (name:string) => {
+			var inx = this.names.indexOf(name);
+			if(inx>=0) return inx;
+			else return this.names.push(name) - 1;
+		};
+		//this.names = inp.shift().split(',');
 		inp.split('\n')
 			.map(line => line.trim())
 			.filter(line => line.length > 0)
 			.forEach(line => {
-				var from = line[0], to = line[2];
+				var from = getId(line[0]), to = getId(line[2]);
 				var outp = new Regex(Type.Or,
-						<any[]>line.split(":")[1].trim().split(","));
-				this.map[from] = this.map[from] || {};
+						<any[]>line.split("over")[1].split(",").map(x => x.trim()));
+				this.map[from] = this.map[from] || [];
 				this.map[from][to] = outp;
 			});
 	}
-
-	map:{[from:string]:{[to:string]:Regex}};
+	names:string[] = [];
+	map:Regex[][] = [];
 }
 var or = (...x:Regex[]) => new Regex(Type.Or, x),
 	concat = (...x:Regex[]) => new Regex(Type.Concat, x),
 	star = (...x:Regex[]) => new Regex(Type.Star, x);
 
+// convert Automat to regex, going from state q1 to q2,
+// using only states from 0 to i
 var L = (a:Automat,q1:number,i:number,q2:number) =>
-	(i==0) ? a.map[q1][q2] : or(
+	(i<0) ? a.map[q1][q2] : or(
 		L(a,q1,i-1,q2),
 		concat(
 			L(a,q1,i-1,i), star(L(a,i,i-1,i)), L(a,i,i-1,q2)
 		)
 	);
+declare var input:HTMLTextAreaElement, output:HTMLPreElement;
 
-var automat = new Automat((<any>document.querySelector('#automat')).value);
-document.write(simplify(L(automat,1,2,2)).toString());
+function convert() {
+	var automat = new Automat((<any>input).value);
+	var maxState = automat.names.length - 1;
+	output.textContent = simplify(L(automat,0,maxState,maxState)).toString();
+}
+convert();

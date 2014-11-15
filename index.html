@@ -1,19 +1,11 @@
 <meta charset='utf-8'>
 Input:
-<textarea id=automat cols=50 rows=30>
-1→1:ε,0
-1→2:1
-2→1:0
-2→2:ε,1
-</textarea>
-<script>qq = {
-	"1":{
-		"1":["ε","0"],
-		"2":["1"]
-	},
-	"2":{
-		"2":["ε","1"],
-		"1":["0"]
-	}
-}</script>
+<div><textarea id=input cols=40 rows=15>
+a→a over ε,0
+a→b over 1
+b→a over 0
+b→b over ε,1
+</textarea></div>
+<p><button onclick='convert()'>Convert DFA to Regex</button></p>
+<div>Output:<pre id=output></pre></div>
 <script src=bin/dfa2regex.js></script>
