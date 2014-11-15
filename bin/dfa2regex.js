@@ -120,6 +120,7 @@ var L = function (a, q1, i, q2) { return (i < 0) ? a.map[q1][q2] : or(L(a, q1, i
 function convert() {
     var automat = new Automat(input.value);
     var maxState = automat.names.length - 1;
-    output.textContent = simplify(L(automat, 0, maxState, maxState)).toString();
+    var regex = L(automat, 0, maxState, maxState);
+    output.textContent = regex + "\n\nsimplified:\n" + simplify(regex);
 }
 convert();

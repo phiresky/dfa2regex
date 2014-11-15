@@ -103,6 +103,7 @@ declare var input:HTMLTextAreaElement, output:HTMLPreElement;
 function convert() {
 	var automat = new Automat(input.value);
 	var maxState = automat.names.length - 1;
-	output.textContent = simplify(L(automat,0,maxState,maxState)).toString();
+	var regex = L(automat,0,maxState,maxState);
+	output.textContent = regex + "\n\nsimplified:\n" + simplify(regex);
 }
 convert();
