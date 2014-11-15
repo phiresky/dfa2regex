@@ -73,6 +73,19 @@ function simplify(r) {
     }
     return r;
 }
+var Automat = (function () {
+    function Automat(inp) {
+        var _this = this;
+        this.map = {};
+        inp.split('\n').map(function (line) { return line.trim(); }).filter(function (line) { return line.length > 0; }).forEach(function (line) {
+            var from = line[0], to = line[2];
+            var outp = new Regex(0 /* Or */, line.split(":")[1].trim().split(","));
+            _this.map[from] = _this.map[from] || {};
+            _this.map[from][to] = outp;
+        });
+    }
+    return Automat;
+})();
 var or = function () {
     var x = [];
     for (var _i = 0; _i < arguments.length; _i++) {
@@ -91,16 +104,7 @@ var or = function () {
         x[_i - 0] = arguments[_i];
     }
     return new Regex(3 /* Star */, x);
-}, literals = function (x) { return new Regex(0 /* Or */, x); };
-var L = function (q1, i, q2) { return (i == 0) ? literals(automat[q1][q2]) : or(L(q1, i - 1, q2), concat(L(q1, i - 1, i), star(L(i, i - 1, i)), L(i, i - 1, q2))); };
-var automat = {
-    '1': {
-        '1': ['ε', '0'],
-        '2': ['1']
-    },
-    '2': {
-        '2': ['ε', '1'],
-        '1': ['0']
-    }
 };
-document.write(simplify(L(1, 2, 2)).toString());
+var L = function (a, q1, i, q2) { return (i == 0) ? a.map[q1][q2] : or(L(a, q1, i - 1, q2), concat(L(a, q1, i - 1, i), star(L(a, i, i - 1, i)), L(a, i, i - 1, q2))); };
+var automat = new Automat(document.querySelector('#automat').value);
+document.write(simplify(L(automat, 1, 2, 2)).toString());

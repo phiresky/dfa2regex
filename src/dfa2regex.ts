@@ -63,28 +63,34 @@ function simplify(r:Regex) {
 	return r;
 }
 
+class Automat {
+	constructor(inp:string) { // parse regex from string a→b:c,d
+		this.map = {};
+		inp.split('\n')
+			.map(line => line.trim())
+			.filter(line => line.length > 0)
+			.forEach(line => {
+				var from = line[0], to = line[2];
+				var outp = new Regex(Type.Or,
+						<any[]>line.split(":")[1].trim().split(","));
+				this.map[from] = this.map[from] || {};
+				this.map[from][to] = outp;
+			});
+	}
+
+	map:{[from:string]:{[to:string]:Regex}};
+}
 var or = (...x:Regex[]) => new Regex(Type.Or, x),
 	concat = (...x:Regex[]) => new Regex(Type.Concat, x),
-	star = (...x:Regex[]) => new Regex(Type.Star, x),
-	literals = (x:string[]) => new Regex(Type.Or, <any[]>x);
-	
-var L = (q1:number,i:number,q2:number) =>
-	(i==0) ? literals(automat[q1][q2]) : or(
-		L(q1,i-1,q2),
+	star = (...x:Regex[]) => new Regex(Type.Star, x);
+
+var L = (a:Automat,q1:number,i:number,q2:number) =>
+	(i==0) ? a.map[q1][q2] : or(
+		L(a,q1,i-1,q2),
 		concat(
-			L(q1,i-1,i), star(L(i,i-1,i)), L(i,i-1,q2)
+			L(a,q1,i-1,i), star(L(a,i,i-1,i)), L(a,i,i-1,q2)
 		)
 	);
 
-var automat:{[from:string]:{[to:string]:string[]}} = {
-	'1':{
-		'1':['ε','0'],
-		'2':['1'],
-	},
-	'2':{
-		'2':['ε','1'],
-		'1':['0']
-	}
-};
-
-document.write(simplify(L(1,2,2)).toString());
+var automat = new Automat((<any>document.querySelector('#automat')).value);
+document.write(simplify(L(automat,1,2,2)).toString());
