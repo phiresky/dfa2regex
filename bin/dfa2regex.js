@@ -76,6 +76,10 @@ function simplify(r) {
                     r.val.splice(i--, 1);
                     b.type = 4 /* Plus */;
                 }
+                else if (a.type == 3 /* Star */ && b.toString() == a.val[0].toString()) {
+                    r.val.splice(i-- + 1, 1);
+                    a.type = 4 /* Plus */;
+                }
             }
             break;
     }

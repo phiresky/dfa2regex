@@ -67,6 +67,13 @@ function simplify(r:Regex) {
 					r.val.splice(i--,1);
 					b.type = Type.Plus;
 				}
+				// (x*x) => (x+)
+				else if(a.type==Type.Star &&
+						b.toString() == a.val[0].toString()) {
+					r.val.splice(i-- +1,1);
+					a.type = Type.Plus;
+				}
+
 			}
 		break;
 	}
