@@ -34,6 +34,15 @@ function simplify(r:Regex) {
 					r.val.pop(); r.type = Type.Maybe;
 				}
 			}
+			for(var i=0;i<r.val.length-1;i++) {
+				var a = r.val[i], b = r.val[i+1];
+				// (a|b*a) => b*a
+				if(b.type == Type.Concat && b.val.length==2
+						&& b.val[0].type == Type.Star
+						&& b.val[1].toString() == a.toString()) {
+					r.val.splice(i--,1);
+				}
+			}
 		break;
 		case Type.Star:
 			// (x*?) => (x*)

@@ -45,6 +45,13 @@ function simplify(r) {
                     r.type = 2 /* Maybe */;
                 }
             }
+            for (var i = 0; i < r.val.length - 1; i++) {
+                var a = r.val[i], b = r.val[i + 1];
+                // (a|b*a) => b*a
+                if (b.type == 1 /* Concat */ && b.val.length == 2 && b.val[0].type == 3 /* Star */ && b.val[1].toString() == a.toString()) {
+                    r.val.splice(i--, 1);
+                }
+            }
             break;
         case 3 /* Star */:
             // (x*?) => (x*)
