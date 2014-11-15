@@ -71,14 +71,13 @@ class Automat {
 			if(inx>=0) return inx;
 			else return this.names.push(name) - 1;
 		};
-		//this.names = inp.shift().split(',');
 		inp.split('\n')
 			.map(line => line.trim())
 			.filter(line => line.length > 0)
 			.forEach(line => {
 				var from = getId(line[0]), to = getId(line[2]);
 				var outp = new Regex(Type.Or,
-						<any[]>line.split("over")[1].split(",").map(x => x.trim()));
+						<any[]>line.split(":")[1].split(",").map(x => x.trim()));
 				this.map[from] = this.map[from] || [];
 				this.map[from][to] = outp;
 			});
@@ -102,7 +101,7 @@ var L = (a:Automat,q1:number,i:number,q2:number) =>
 declare var input:HTMLTextAreaElement, output:HTMLPreElement;
 
 function convert() {
-	var automat = new Automat((<any>input).value);
+	var automat = new Automat(input.value);
 	var maxState = automat.names.length - 1;
 	output.textContent = simplify(L(automat,0,maxState,maxState)).toString();
 }

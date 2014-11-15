@@ -86,10 +86,9 @@ var Automat = (function () {
             else
                 return _this.names.push(name) - 1;
         };
-        //this.names = inp.shift().split(',');
         inp.split('\n').map(function (line) { return line.trim(); }).filter(function (line) { return line.length > 0; }).forEach(function (line) {
             var from = getId(line[0]), to = getId(line[2]);
-            var outp = new Regex(0 /* Or */, line.split("over")[1].split(",").map(function (x) { return x.trim(); }));
+            var outp = new Regex(0 /* Or */, line.split(":")[1].split(",").map(function (x) { return x.trim(); }));
             _this.map[from] = _this.map[from] || [];
             _this.map[from][to] = outp;
         });
