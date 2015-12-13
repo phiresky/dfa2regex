@@ -19,4 +19,4 @@ Which is automatically simplified to
 
 
 The algorithm itself is short:
-https://github.com/phiresky/dfa2regex/blob/gh-pages/src/dfa2regex.ts#L108-116
+https://github.com/phiresky/dfa2regex/blob/gh-pages/src/dfa2regex.ts#L108-L116
